@@ -19,6 +19,8 @@
 #include <QNetworkConfigurationManager>
 #include <QTreeWidgetItem>
 #include <QHash>
+#include <QFileSystemModel>
+#include <QProgressDialog>
 
 namespace Ui {
 class proftp;
@@ -36,6 +38,8 @@ private slots:
     void loadServersList();
 
     void on_buttonConnectServer_clicked();
+
+    void connectToFtp();
 
     void ftpCommandFinished(int commandId, bool error);
 
@@ -59,9 +63,45 @@ private slots:
 
     void processItem(QTreeWidgetItem *item, int column);
 
-    void addToListLocal(const QUrlInfo &urlInfo);
+    void on_localFolderView_clicked(const QModelIndex &index);
 
-    void on_localFolderView_doubleClicked(const QModelIndex &index);
+    void on_buttonSynchroniseFolders_clicked();
+
+    void on_buttonDownload_clicked();
+
+    void on_buttonUpload_clicked();
+
+    void updateDataTransferProgress(qint64 readBytes, qint64 totalBytes);
+
+    void cancelDownloadOrUpload();
+
+    void on_remoteFolderView_doubleClicked(const QModelIndex &index);
+
+    void on_buttonServerManager_clicked();
+
+    void on_buttonHome_clicked();
+
+    void on_autoLoginCheck_clicked();
+
+    void on_serversSelectProperties_currentIndexChanged();
+
+    void on_actionServer_manager_triggered();
+
+    void on_actionLogs_triggered();
+
+    void on_actionConnect_triggered();
+
+    void on_actionDisconnect_triggered();
+
+    void on_actionSynchronise_folders_triggered();
+
+    void on_actionDownload_file_triggered();
+
+    void on_actionUpload_file_triggered();
+
+    void on_actionHelp_triggered();
+
+    void on_actionAbout_ProgFTP_triggered();
 
 private:
     Ui::proftp *ui;
@@ -70,9 +110,17 @@ public:
     QHash<QString, bool> isDirectory;
     QString currentPath;
     QFtp *ftp;
-    QDirModel* model;
+
+    QFileSystemModel *dirModel;
+    QFileSystemModel *fileModel;
+
+    QProgressDialog *progressDialog;
+
+    QFile *file;
 
     QString nameFile;
+
+    int statut;
 
 };
 

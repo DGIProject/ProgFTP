@@ -1,5 +1,6 @@
 #include "proftp.h"
 #include "ui_proftp.h"
+#include "windowhelp.h"
 #include <QSettings>
 #include <QMessageBox>
 #include <QDir>
@@ -20,26 +21,47 @@
 #include <QTcpSocket>
 #include <QTreeWidgetItem>
 #include <QHash>
+#include <QFileSystemModel>
+#include <QProgressDialog>
 
 proftp::proftp(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::proftp)
 {
     ui->setupUi(this);
+    ui->windowServerManager->hide();
 
+    setWindowTitle("ProgFTP");
+
+    ui->actionDisconnect->setEnabled(false);
+    ui->actionSynchronise_folders->setEnabled(false);
+    ui->actionDownload_file->setEnabled(false);
+    ui->actionUpload_file->setEnabled(false);
+
+    ui->buttonSynchroniseFolders->setEnabled(false);
+    ui->buttonDownload->setEnabled(false);
+    ui->buttonUpload->setEnabled(false);
     ui->buttonReturnDirectory->setEnabled(false);
 
     ui->buttonReturnDirectory->setIcon(QPixmap("images/cdtoparent.png"));
 
-    model = new QDirModel;
-    model->setReadOnly(false);
-    model->setSorting(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name);
+    progressDialog = new QProgressDialog(this);
+
+    connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelDownload()));
+
+    QDirModel *model = new QDirModel(this);
+
     ui->localFolderView->setModel(model);
     ui->localFolderView->setEnabled(false);
 
+    ui->localFilesView->setModel(model);
     ui->localFilesView->setEnabled(false);
-    ui->localFilesView->setRootIsDecorated(false);
-    ui->localFilesView->header()->setStretchLastSection(false);
+
+    dirModel = new QFileSystemModel(this);
+    dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
+
+    fileModel = new QFileSystemModel(this);
+    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllEntries);
 
     ui->remoteFolderView->setEnabled(false);
     ui->remoteFolderView->setRootIsDecorated(false);
@@ -48,12 +70,25 @@ proftp::proftp(QWidget *parent) :
     connect(ui->remoteFolderView, SIGNAL(itemActivated(QTreeWidgetItem*,int)),
             this, SLOT(processItem(QTreeWidgetItem*,int)));
 
-    QSettings settings("properties.ini", QSettings::IniFormat);
+    connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     proftp::loadServersList();
 
     ui->serversList->setCurrentRow(0);
     proftp::on_serversList_pressed();
+
+    if(QFile::exists("properties.ini"))
+    {
+        QSettings settings("properties.ini", QSettings::IniFormat);
+
+        if(settings.value("autologin").toBool() == true)
+        {
+            ui->autoLoginCheck->setChecked(true);
+
+            proftp::on_buttonConnectServer_clicked();
+        }
+    }
 }
 
 proftp::~proftp()
@@ -65,6 +100,7 @@ void proftp::loadServersList()
 {
     ui->serversList->clear();
     ui->serversSelect->clear();
+    ui->serversSelectProperties->clear();
 
     QDir dir("servers/");
     QStringList filters("*.ini" );
@@ -76,72 +112,163 @@ void proftp::loadServersList()
 
     ui->serversList->addItems(list);
     ui->serversSelect->addItems(list);
+    ui->serversSelectProperties->addItems(list);
 }
 
 void proftp::on_buttonConnectServer_clicked()
 {
-    if(ui->serversSelect->currentText() != "")
+    if(statut == 1)
     {
-        QString nameFileT = "servers/" + ui->serversSelect->currentText();
-
-        QSettings settings(nameFileT, QSettings::IniFormat);
-
-        QModelIndex index = model->index(QString(settings.value("localfolder").toString()));
-
-        ui->localFolderView->expand(index);
-        ui->localFolderView->scrollTo(index);
-        ui->localFolderView->setCurrentIndex(index);
-        ui->localFolderView->resizeColumnToContents(0);
-        ui->localFolderView->setEnabled(true);
+        ftp->abort();
+        ftp->deleteLater();
+        ftp = 0;
 
         ui->remoteFolderView->clear();
+        ui->remoteFolderView->setEnabled(false);
+        ui->localFolderView->reset();
+        ui->localFolderView->setEnabled(false);
+        ui->localFilesView->reset();
+        ui->localFilesView->setEnabled(false);
+        ui->actionConnect->setEnabled(true);
+        ui->actionDisconnect->setEnabled(false);
+        ui->actionSynchronise_folders->setEnabled(false);
+        ui->actionDownload_file->setEnabled(false);
+        ui->actionUpload_file->setEnabled(false);
+        ui->buttonSynchroniseFolders->setEnabled(false);
+        ui->buttonDownload->setEnabled(false);
+        ui->logFTP->append("Stopping ftp connection");
+        ui->buttonConnectServer->setText("Connect");
 
-        ui->logFTP->append("Tentative de connexion au serveur...");
-
-        ftp = new QFtp(this);
-
-        connect(ftp, SIGNAL(commandFinished(int,bool)),
-                this, SLOT(ftpCommandFinished(int,bool)));
-        connect(ftp, SIGNAL(listInfo(QUrlInfo)),
-                this, SLOT(addToList(QUrlInfo)));
-
-        ftp->connectToHost(QString(settings.value("adress").toString()), 21);
-        ftp->login(QString(settings.value("login").toString()),QString(settings.value("password").toString()));
-        ftp->cd(QString(settings.value("remotefolder").toString()));
+        statut = 0;
     }
     else
     {
-        QMessageBox::critical(this,"Error","You need to have at least one ftp server");
+        if(ui->serversSelect->currentText() != "")
+        {
+            proftp::connectToFtp();
+        }
+        else
+        {
+            QMessageBox::critical(this,"Error","You need to have at least one ftp server");
+        }
     }
+}
+
+void proftp::connectToFtp()
+{
+    QString nameFileT = "servers/" + ui->serversSelect->currentText();
+
+    QSettings settings(nameFileT, QSettings::IniFormat);
+
+    QString path = settings.value("localfolder").toString();
+
+    dirModel->setRootPath(path);
+
+    fileModel->setRootPath(path);
+
+    QModelIndex indexDir = dirModel->index(QString(settings.value("localfolder").toString()));
+
+    ui->localFolderView->setModel(dirModel);
+    ui->localFolderView->expand(indexDir);
+    ui->localFolderView->scrollTo(indexDir);
+    ui->localFolderView->setEnabled(true);
+
+    QModelIndex indexFile = fileModel->index(QString(settings.value("localfolder").toString()));
+
+    ui->localFilesView->setModel(fileModel);
+    ui->localFilesView->setEnabled(true);
+
+    ui->remoteFolderView->clear();
+
+    ui->logFTP->append("Attempt to connect to the server ...");
+
+    ui->actionDisconnect->setEnabled(true);
+    ui->actionSynchronise_folders->setEnabled(true);
+    ui->actionDownload_file->setEnabled(true);
+    ui->actionUpload_file->setEnabled(true);
+    ui->actionConnect->setEnabled(false);
+    ui->buttonSynchroniseFolders->setEnabled(true);
+    ui->buttonDownload->setEnabled(true);
+    ui->buttonUpload->setEnabled(true);
+    ui->buttonConnectServer->setText("Disconnect");
+
+    statut = 1;
+
+    ftp = new QFtp(this);
+
+    connect(ftp, SIGNAL(commandFinished(int,bool)),
+            this, SLOT(ftpCommandFinished(int,bool)));
+    connect(ftp, SIGNAL(listInfo(QUrlInfo)),
+            this, SLOT(addToList(QUrlInfo)));
+    connect(ftp, SIGNAL(dataTransferProgress(qint64,qint64)),
+            this, SLOT(updateDataTransferProgress(qint64,qint64)));
+
+    ftp->connectToHost(QString(settings.value("adress").toString()), 21);
+
+    if(settings.value("login").toString() == "" || settings.value("password").toString() == "")
+    {
+        ftp->login();
+    }
+    else
+    {
+        ftp->login(QString(settings.value("login").toString()),QString(settings.value("password").toString()));
+    }
+
+    ftp->cd(QString(settings.value("remotefolder").toString()));
 }
 
 void proftp::ftpCommandFinished(int, bool error)
 {
-    if (ftp->currentCommand() == QFtp::ConnectToHost) {
-        if (error) {
-            QMessageBox::information(this, tr("FTP"),
-                                     tr("Unable to connect to the FTP server "
-                                        "at %1. Please check that the host "
-                                        "name is correct."));
+    if (ftp->currentCommand() == QFtp::ConnectToHost)
+    {
+        if (error)
+        {
+            ui->logFTP->append("<span style=\"color: red\">Unabled to connect to the server</span>");
         }
 
-        ui->logFTP->append("<span style=\"color: green\">Connexion réussie.</span>");
+        ui->logFTP->append("<span style=\"color: green\">Connected from the server</span>");
     }
 
     if (ftp->currentCommand() == QFtp::Login)
         ftp->list();
 
-    if (ftp->currentCommand() == QFtp::Get) {
-        if (error) {
-            ui->logFTP->append(tr("Canceled download of %1."));
-            //file->close();
-            //file->remove();
-        } else {
-            ui->logFTP->append(tr("Downloaded %1 to current directory."));
-            //file->close();
+    if (ftp->currentCommand() == QFtp::Get)
+    {
+        if (error)
+        {
+            ui->logFTP->append(tr("<span style=\"color: red\">Canceled download</span>"));
+            file->close();
+            file->remove();
         }
-        //delete file;
-        //progressDialog->hide();
+        else
+        {
+            ui->logFTP->append(tr("<span style=\"color: green\">Downloaded to current directory</span>"));
+            file->close();
+        }
+
+        delete file;
+
+        progressDialog->hide();
+        ui->buttonDownload->setEnabled(true);
+    }
+    else if(ftp->currentCommand() == QFtp::Put)
+    {
+        if (error)
+        {
+            ui->logFTP->append(tr("<span style=\"color: red\">Canceled upload</span>"));
+            file->close();
+            file->remove();
+        }
+        else
+        {
+            ui->logFTP->append(tr("<span style=\"color: green\">Upload the current directory</span>"));
+            file->close();
+        }
+
+        delete file;
+
+        progressDialog->hide();
+        ui->buttonUpload->setEnabled(true);
     }
     else if (ftp->currentCommand() == QFtp::List)
     {
@@ -281,26 +408,205 @@ void proftp::processItem(QTreeWidgetItem *item, int /*column*/)
     qDebug() << currentPath;
 }
 
-void proftp::addToListLocal(const QUrlInfo &urlInfo)
+void proftp::on_localFolderView_clicked(const QModelIndex &index)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem;
-    item->setText(0, urlInfo.name());
-    item->setText(1, QString::number(urlInfo.size()));
-    item->setText(2, urlInfo.owner());
-    item->setText(3, urlInfo.group());
-    item->setText(4, urlInfo.lastModified().toString("MMM dd yyyy"));
+    QString path = dirModel->fileInfo(index).absoluteFilePath();
 
-    QPixmap pixmap(urlInfo.isDir() ? "images/dir.png" : "images/file.png");
-    item->setIcon(0, pixmap);
+    ui->localFilesView->setRootIndex(fileModel->setRootPath(path));
+}
 
-    ui->localFilesView->addTopLevelItem(item);
-    if (!ui->localFilesView->currentItem()) {
-        ui->localFilesView->setCurrentItem(ui->localFilesView->topLevelItem(0));
-        ui->localFilesView->setEnabled(true);
+void proftp::on_buttonSynchroniseFolders_clicked()
+{
+
+}
+
+void proftp::on_buttonDownload_clicked()
+{
+    QString fileName = "D:/" + ui->remoteFolderView->currentItem()->text(0);
+
+    if (QFile::exists(fileName))
+    {
+        int answer = QMessageBox::question(this,"Question","This file already exist, do you want to remplace it ?", QMessageBox::Yes | QMessageBox::No);
+
+        if(!answer == QMessageBox::Yes)
+        {
+            exit(0);
+        }
+    }
+
+    file = new QFile(fileName);
+    if (!file->open(QIODevice::WriteOnly)) {
+        QMessageBox::information(this, tr("FTP"),
+                                 tr("Unable to save the file %1: %2.")
+                                 .arg(fileName).arg(file->errorString()));
+        delete file;
+        return;
+    }
+
+    ftp->get(ui->remoteFolderView->currentItem()->text(0), file);
+
+    ui->buttonDownload->setEnabled(false);
+
+    progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
+    progressDialog->exec();
+
+    proftp::connectToFtp();
+}
+
+void proftp::on_buttonUpload_clicked()
+{
+    file = new QFile("D:/text.txt");
+
+    if(file->open(QIODevice::ReadOnly))
+    {
+        ftp->put(file, "test.txt");
+
+        ui->buttonUpload->setEnabled(false);
+
+        progressDialog->setLabelText(tr("Uploading ..."));
+        progressDialog->exec();
+
+        proftp::connectToFtp();
+    }
+    else
+    {
+        QMessageBox::critical(this,"Error","We can't find the selected file");
     }
 }
 
-void proftp::on_localFolderView_doubleClicked(const QModelIndex &index)
+void proftp::updateDataTransferProgress(qint64 readBytes, qint64 totalBytes)
 {
-    qDebug() << index;
+    progressDialog->setMaximum(totalBytes);
+    progressDialog->setValue(readBytes);
+}
+
+void proftp::cancelDownloadOrUpload()
+{
+    ftp->abort();
+
+    if (file->exists()) {
+        file->close();
+        file->remove();
+    }
+    delete file;
+}
+
+void proftp::on_remoteFolderView_doubleClicked(const QModelIndex &index)
+{
+    QFileInfo fileInfo = ui->remoteFolderView->currentItem()->text(0);
+
+    if(!fileInfo.isDir())
+    {
+        QString nameFileT = "servers/" + ui->serversSelect->currentText();
+
+        QSettings settings(nameFileT, QSettings::IniFormat);
+
+        QString fileName = ui->remoteFolderView->currentItem()->text(0);
+
+        if (QFile::exists(fileName))
+        {
+            int answer = QMessageBox::question(this,"Question","This file already exist, do you want to remplace it ?", QMessageBox::Yes | QMessageBox::No);
+
+            if(!answer == QMessageBox::Yes)
+            {
+                exit(0);
+            }
+        }
+
+        file = new QFile(fileName);
+        if (!file->open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this, tr("FTP"),
+                                     tr("Unable to save the file %1: %2.")
+                                     .arg(fileName).arg(file->errorString()));
+            delete file;
+            return;
+        }
+
+        ftp->get(ui->remoteFolderView->currentItem()->text(0), file);
+
+        ui->logFTP->append(tr("Downloading ...").arg(fileName));
+        progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
+        ui->buttonDownload->setEnabled(false);
+        progressDialog->exec();
+    }
+}
+
+void proftp::on_buttonServerManager_clicked()
+{
+    ui->windowHome->hide();
+    ui->windowServerManager->show();
+}
+
+void proftp::on_buttonHome_clicked()
+{
+    ui->windowServerManager->hide();
+    ui->windowHome->show();
+}
+
+void proftp::on_autoLoginCheck_clicked()
+{
+    QSettings settings("properties.ini", QSettings::IniFormat);
+
+    if(ui->autoLoginCheck->isChecked() == true)
+    {
+        settings.setValue("autologin", true);
+        settings.setValue("servername", ui->serversSelectProperties->currentText());
+    }
+    else
+    {
+        settings.setValue("autologin", false);
+    }
+}
+
+void proftp::on_serversSelectProperties_currentIndexChanged()
+{
+    QSettings settings("properties.ini", QSettings::IniFormat);
+
+    settings.setValue("servername", ui->serversSelectProperties->currentText());
+}
+
+void proftp::on_actionServer_manager_triggered()
+{
+    proftp::on_buttonServerManager_clicked();
+}
+
+void proftp::on_actionLogs_triggered()
+{
+
+}
+
+void proftp::on_actionConnect_triggered()
+{
+    proftp::on_buttonConnectServer_clicked();
+}
+
+void proftp::on_actionDisconnect_triggered()
+{
+    proftp::on_buttonConnectServer_clicked();
+}
+
+void proftp::on_actionSynchronise_folders_triggered()
+{
+
+}
+
+void proftp::on_actionDownload_file_triggered()
+{
+    proftp::on_buttonDownload_clicked();
+}
+
+void proftp::on_actionUpload_file_triggered()
+{
+    proftp::on_buttonUpload_clicked();
+}
+
+void proftp::on_actionHelp_triggered()
+{
+    windowHelp *w = new windowHelp(this);
+    w->show();
+}
+
+void proftp::on_actionAbout_ProgFTP_triggered()
+{
+    QProcess::execute("cmd /c start http://pox.alwaysdata.net/programs.php?p=progftp");
 }

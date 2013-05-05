@@ -14,8 +14,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        proftp.cpp
+        proftp.cpp \
+    windowhelp.cpp
 
-HEADERS  += proftp.h
+HEADERS  += proftp.h \
+    windowhelp.h
 
-FORMS    += proftp.ui
+FORMS    += proftp.ui \
+    windowhelp.ui
