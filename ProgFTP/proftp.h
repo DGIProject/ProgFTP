@@ -103,6 +103,8 @@ private slots:
 
     void on_actionAbout_ProgFTP_triggered();
 
+    void on_buttonSync_clicked();
+
 private:
     Ui::proftp *ui;
 
@@ -112,13 +114,13 @@ public:
     QFtp *ftp;
 
     QFileSystemModel *dirModel;
-    QFileSystemModel *fileModel;
 
     QProgressDialog *progressDialog;
 
     QFile *file;
 
-    QString nameFile;
+    QString nameFileSettings;
+    QString linkLocalFolderView;
 
     int statut;
 

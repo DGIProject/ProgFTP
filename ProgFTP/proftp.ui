@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>911</width>
+    <width>431</width>
     <height>501</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>55555</width>
+    <width>431</width>
     <height>501</height>
    </size>
   </property>
@@ -40,7 +40,7 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>101</width>
+       <width>91</width>
        <height>23</height>
       </rect>
      </property>
@@ -57,11 +57,14 @@
        <height>61</height>
       </rect>
      </property>
+     <property name="textInteractionFlags">
+      <set>Qt::NoTextInteraction</set>
+     </property>
     </widget>
     <widget class="Line" name="line">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>180</x>
        <y>10</y>
        <width>16</width>
        <height>21</height>
@@ -71,156 +74,10 @@
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonSynchroniseFolders">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>450</y>
-       <width>131</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Synchronise folders</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonDownload">
-     <property name="geometry">
-      <rect>
-       <x>160</x>
-       <y>450</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Download</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Remote files :</string>
-     </property>
-    </widget>
-    <widget class="QTreeWidget" name="remoteFolderView">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>140</y>
-       <width>201</width>
-       <height>301</height>
-      </rect>
-     </property>
-     <column>
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Size</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Owner</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Group</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Time</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QTreeView" name="localFolderView">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>140</y>
-       <width>201</width>
-       <height>141</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QListView" name="localFilesView">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>290</y>
-       <width>201</width>
-       <height>151</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_10">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>110</y>
-       <width>61</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Local files :</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonReturnDirectory">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>110</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonAddFolderRemote">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>110</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonDeleteFolderRemote">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>110</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QComboBox" name="serversSelect">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>210</x>
        <y>10</y>
        <width>131</width>
        <height>22</height>
@@ -230,60 +87,285 @@
     <widget class="QPushButton" name="buttonConnectServer">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>350</x>
        <y>10</y>
-       <width>81</width>
-       <height>21</height>
+       <width>71</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
       <string>Connect</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="buttonAddFolderLocal">
+    <widget class="QWidget" name="windowDataTransfert" native="true">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>110</y>
-       <width>21</width>
-       <height>21</height>
+       <x>0</x>
+       <y>100</y>
+       <width>431</width>
+       <height>381</height>
       </rect>
      </property>
-     <property name="text">
-      <string/>
-     </property>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remote files :</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonReturnDirectory">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>10</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonAddFolderRemote">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>10</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonDeleteFolderRemote">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>10</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QTreeWidget" name="remoteFolderView">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>201</width>
+        <height>301</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Size</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Owner</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Group</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Time</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QPushButton" name="buttonDownload">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>350</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Download</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>10</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Local files :</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonAddFolderLocal">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>10</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonDeleteFolderLocal">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>10</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QTreeView" name="localFolderView">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>40</y>
+        <width>201</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="buttonUpload">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>350</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Upload</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="localFilesView">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>190</y>
+        <width>201</width>
+        <height>151</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
-    <widget class="QPushButton" name="buttonDeleteFolderLocal">
+    <widget class="QPushButton" name="buttonSync">
      <property name="geometry">
       <rect>
-       <x>320</x>
-       <y>110</y>
-       <width>21</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonUpload">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>450</y>
-       <width>75</width>
+       <x>110</x>
+       <y>10</y>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>Upload</string>
+      <string>Sync</string>
      </property>
+    </widget>
+    <widget class="QWidget" name="windowSync" native="true">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>90</y>
+       <width>431</width>
+       <height>391</height>
+      </rect>
+     </property>
+     <widget class="QPushButton" name="buttonSynchroniseFolders">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>360</y>
+        <width>131</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Synchronise folders</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remote files :</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>20</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Local files :</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="localFilesSync">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>40</y>
+        <width>201</width>
+        <height>311</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="remoteFilesSync">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>201</width>
+        <height>311</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="windowServerManager" native="true">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>0</x>
       <y>0</y>
       <width>431</width>
       <height>481</height>
@@ -626,7 +708,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>911</width>
+     <width>431</width>
      <height>20</height>
     </rect>
    </property>

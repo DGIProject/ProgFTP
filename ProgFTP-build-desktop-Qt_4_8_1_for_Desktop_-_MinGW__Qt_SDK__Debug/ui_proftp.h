@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'proftp.ui'
 **
-** Created: Sat May 4 18:56:47 2013
+** Created: Mon May 6 19:16:06 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -21,7 +21,6 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
-#include <QtGui/QListView>
 #include <QtGui/QListWidget>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
@@ -53,21 +52,28 @@ public:
     QPushButton *buttonServerManager;
     QTextEdit *logFTP;
     QFrame *line;
-    QPushButton *buttonSynchroniseFolders;
-    QPushButton *buttonDownload;
+    QComboBox *serversSelect;
+    QPushButton *buttonConnectServer;
+    QWidget *windowDataTransfert;
     QLabel *label_9;
-    QTreeWidget *remoteFolderView;
-    QTreeView *localFolderView;
-    QListView *localFilesView;
-    QLabel *label_10;
     QPushButton *buttonReturnDirectory;
     QPushButton *buttonAddFolderRemote;
     QPushButton *buttonDeleteFolderRemote;
-    QComboBox *serversSelect;
-    QPushButton *buttonConnectServer;
+    QTreeWidget *remoteFolderView;
+    QPushButton *buttonDownload;
+    QLabel *label_10;
     QPushButton *buttonAddFolderLocal;
     QPushButton *buttonDeleteFolderLocal;
+    QTreeView *localFolderView;
     QPushButton *buttonUpload;
+    QListWidget *localFilesView;
+    QPushButton *buttonSync;
+    QWidget *windowSync;
+    QPushButton *buttonSynchroniseFolders;
+    QLabel *label;
+    QLabel *label_11;
+    QListWidget *localFilesSync;
+    QListWidget *remoteFilesSync;
     QWidget *windowServerManager;
     QPushButton *buttonHome;
     QFrame *line_2;
@@ -105,9 +111,9 @@ public:
     {
         if (proftp->objectName().isEmpty())
             proftp->setObjectName(QString::fromUtf8("proftp"));
-        proftp->resize(911, 501);
+        proftp->resize(431, 501);
         proftp->setMinimumSize(QSize(431, 501));
-        proftp->setMaximumSize(QSize(55555, 501));
+        proftp->setMaximumSize(QSize(431, 501));
         actionLogs = new QAction(proftp);
         actionLogs->setObjectName(QString::fromUtf8("actionLogs"));
         actionExit = new QAction(proftp);
@@ -137,63 +143,85 @@ public:
         windowHome->setGeometry(QRect(0, 0, 431, 481));
         buttonServerManager = new QPushButton(windowHome);
         buttonServerManager->setObjectName(QString::fromUtf8("buttonServerManager"));
-        buttonServerManager->setGeometry(QRect(10, 10, 101, 23));
+        buttonServerManager->setGeometry(QRect(10, 10, 91, 23));
         logFTP = new QTextEdit(windowHome);
         logFTP->setObjectName(QString::fromUtf8("logFTP"));
         logFTP->setGeometry(QRect(10, 40, 411, 61));
+        logFTP->setTextInteractionFlags(Qt::NoTextInteraction);
         line = new QFrame(windowHome);
         line->setObjectName(QString::fromUtf8("line"));
-        line->setGeometry(QRect(120, 10, 16, 21));
+        line->setGeometry(QRect(180, 10, 16, 21));
         line->setFrameShape(QFrame::VLine);
         line->setFrameShadow(QFrame::Sunken);
-        buttonSynchroniseFolders = new QPushButton(windowHome);
-        buttonSynchroniseFolders->setObjectName(QString::fromUtf8("buttonSynchroniseFolders"));
-        buttonSynchroniseFolders->setGeometry(QRect(10, 450, 131, 23));
-        buttonDownload = new QPushButton(windowHome);
-        buttonDownload->setObjectName(QString::fromUtf8("buttonDownload"));
-        buttonDownload->setGeometry(QRect(160, 450, 75, 23));
-        label_9 = new QLabel(windowHome);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
-        label_9->setGeometry(QRect(10, 110, 71, 16));
-        remoteFolderView = new QTreeWidget(windowHome);
-        remoteFolderView->setObjectName(QString::fromUtf8("remoteFolderView"));
-        remoteFolderView->setGeometry(QRect(10, 140, 201, 301));
-        localFolderView = new QTreeView(windowHome);
-        localFolderView->setObjectName(QString::fromUtf8("localFolderView"));
-        localFolderView->setGeometry(QRect(220, 140, 201, 141));
-        localFilesView = new QListView(windowHome);
-        localFilesView->setObjectName(QString::fromUtf8("localFilesView"));
-        localFilesView->setGeometry(QRect(220, 290, 201, 151));
-        label_10 = new QLabel(windowHome);
-        label_10->setObjectName(QString::fromUtf8("label_10"));
-        label_10->setGeometry(QRect(220, 110, 61, 16));
-        buttonReturnDirectory = new QPushButton(windowHome);
-        buttonReturnDirectory->setObjectName(QString::fromUtf8("buttonReturnDirectory"));
-        buttonReturnDirectory->setGeometry(QRect(90, 110, 21, 21));
-        buttonAddFolderRemote = new QPushButton(windowHome);
-        buttonAddFolderRemote->setObjectName(QString::fromUtf8("buttonAddFolderRemote"));
-        buttonAddFolderRemote->setGeometry(QRect(120, 110, 21, 21));
-        buttonDeleteFolderRemote = new QPushButton(windowHome);
-        buttonDeleteFolderRemote->setObjectName(QString::fromUtf8("buttonDeleteFolderRemote"));
-        buttonDeleteFolderRemote->setGeometry(QRect(150, 110, 21, 21));
         serversSelect = new QComboBox(windowHome);
         serversSelect->setObjectName(QString::fromUtf8("serversSelect"));
-        serversSelect->setGeometry(QRect(150, 10, 131, 22));
+        serversSelect->setGeometry(QRect(210, 10, 131, 22));
         buttonConnectServer = new QPushButton(windowHome);
         buttonConnectServer->setObjectName(QString::fromUtf8("buttonConnectServer"));
-        buttonConnectServer->setGeometry(QRect(300, 10, 81, 21));
-        buttonAddFolderLocal = new QPushButton(windowHome);
+        buttonConnectServer->setGeometry(QRect(350, 10, 71, 23));
+        windowDataTransfert = new QWidget(windowHome);
+        windowDataTransfert->setObjectName(QString::fromUtf8("windowDataTransfert"));
+        windowDataTransfert->setGeometry(QRect(0, 100, 431, 381));
+        label_9 = new QLabel(windowDataTransfert);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_9->setGeometry(QRect(10, 10, 71, 16));
+        buttonReturnDirectory = new QPushButton(windowDataTransfert);
+        buttonReturnDirectory->setObjectName(QString::fromUtf8("buttonReturnDirectory"));
+        buttonReturnDirectory->setGeometry(QRect(80, 10, 21, 21));
+        buttonAddFolderRemote = new QPushButton(windowDataTransfert);
+        buttonAddFolderRemote->setObjectName(QString::fromUtf8("buttonAddFolderRemote"));
+        buttonAddFolderRemote->setGeometry(QRect(110, 10, 21, 21));
+        buttonDeleteFolderRemote = new QPushButton(windowDataTransfert);
+        buttonDeleteFolderRemote->setObjectName(QString::fromUtf8("buttonDeleteFolderRemote"));
+        buttonDeleteFolderRemote->setGeometry(QRect(140, 10, 21, 21));
+        remoteFolderView = new QTreeWidget(windowDataTransfert);
+        remoteFolderView->setObjectName(QString::fromUtf8("remoteFolderView"));
+        remoteFolderView->setGeometry(QRect(10, 40, 201, 301));
+        buttonDownload = new QPushButton(windowDataTransfert);
+        buttonDownload->setObjectName(QString::fromUtf8("buttonDownload"));
+        buttonDownload->setGeometry(QRect(70, 350, 75, 23));
+        label_10 = new QLabel(windowDataTransfert);
+        label_10->setObjectName(QString::fromUtf8("label_10"));
+        label_10->setGeometry(QRect(240, 10, 61, 16));
+        buttonAddFolderLocal = new QPushButton(windowDataTransfert);
         buttonAddFolderLocal->setObjectName(QString::fromUtf8("buttonAddFolderLocal"));
-        buttonAddFolderLocal->setGeometry(QRect(290, 110, 21, 21));
-        buttonDeleteFolderLocal = new QPushButton(windowHome);
+        buttonAddFolderLocal->setGeometry(QRect(310, 10, 21, 21));
+        buttonDeleteFolderLocal = new QPushButton(windowDataTransfert);
         buttonDeleteFolderLocal->setObjectName(QString::fromUtf8("buttonDeleteFolderLocal"));
-        buttonDeleteFolderLocal->setGeometry(QRect(320, 110, 21, 21));
-        buttonUpload = new QPushButton(windowHome);
+        buttonDeleteFolderLocal->setGeometry(QRect(340, 10, 21, 21));
+        localFolderView = new QTreeView(windowDataTransfert);
+        localFolderView->setObjectName(QString::fromUtf8("localFolderView"));
+        localFolderView->setGeometry(QRect(220, 40, 201, 141));
+        buttonUpload = new QPushButton(windowDataTransfert);
         buttonUpload->setObjectName(QString::fromUtf8("buttonUpload"));
-        buttonUpload->setGeometry(QRect(250, 450, 75, 23));
+        buttonUpload->setGeometry(QRect(280, 350, 75, 23));
+        localFilesView = new QListWidget(windowDataTransfert);
+        localFilesView->setObjectName(QString::fromUtf8("localFilesView"));
+        localFilesView->setGeometry(QRect(220, 190, 201, 151));
+        buttonSync = new QPushButton(windowHome);
+        buttonSync->setObjectName(QString::fromUtf8("buttonSync"));
+        buttonSync->setGeometry(QRect(110, 10, 61, 23));
+        windowSync = new QWidget(windowHome);
+        windowSync->setObjectName(QString::fromUtf8("windowSync"));
+        windowSync->setGeometry(QRect(0, 90, 431, 391));
+        buttonSynchroniseFolders = new QPushButton(windowSync);
+        buttonSynchroniseFolders->setObjectName(QString::fromUtf8("buttonSynchroniseFolders"));
+        buttonSynchroniseFolders->setGeometry(QRect(140, 360, 131, 23));
+        label = new QLabel(windowSync);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setGeometry(QRect(10, 20, 71, 16));
+        label_11 = new QLabel(windowSync);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+        label_11->setGeometry(QRect(220, 20, 61, 16));
+        localFilesSync = new QListWidget(windowSync);
+        localFilesSync->setObjectName(QString::fromUtf8("localFilesSync"));
+        localFilesSync->setGeometry(QRect(220, 40, 201, 311));
+        remoteFilesSync = new QListWidget(windowSync);
+        remoteFilesSync->setObjectName(QString::fromUtf8("remoteFilesSync"));
+        remoteFilesSync->setGeometry(QRect(10, 40, 201, 311));
         windowServerManager = new QWidget(centralWidget);
         windowServerManager->setObjectName(QString::fromUtf8("windowServerManager"));
-        windowServerManager->setGeometry(QRect(460, 0, 431, 481));
+        windowServerManager->setGeometry(QRect(0, 0, 431, 481));
         buttonHome = new QPushButton(windowServerManager);
         buttonHome->setObjectName(QString::fromUtf8("buttonHome"));
         buttonHome->setGeometry(QRect(10, 10, 101, 23));
@@ -281,7 +309,7 @@ public:
         proftp->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(proftp);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 911, 20));
+        menuBar->setGeometry(QRect(0, 0, 431, 20));
         menuHome = new QMenu(menuBar);
         menuHome->setObjectName(QString::fromUtf8("menuHome"));
         menuServer = new QMenu(menuBar);
@@ -328,23 +356,26 @@ public:
         actionAbout_Qt->setText(QApplication::translate("proftp", "About Qt", 0, QApplication::UnicodeUTF8));
         actionUpload_file->setText(QApplication::translate("proftp", "Upload file", 0, QApplication::UnicodeUTF8));
         buttonServerManager->setText(QApplication::translate("proftp", "Server manager", 0, QApplication::UnicodeUTF8));
-        buttonSynchroniseFolders->setText(QApplication::translate("proftp", "Synchronise folders", 0, QApplication::UnicodeUTF8));
-        buttonDownload->setText(QApplication::translate("proftp", "Download", 0, QApplication::UnicodeUTF8));
+        buttonConnectServer->setText(QApplication::translate("proftp", "Connect", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("proftp", "Remote files :", 0, QApplication::UnicodeUTF8));
+        buttonReturnDirectory->setText(QString());
+        buttonAddFolderRemote->setText(QString());
+        buttonDeleteFolderRemote->setText(QString());
         QTreeWidgetItem *___qtreewidgetitem = remoteFolderView->headerItem();
         ___qtreewidgetitem->setText(4, QApplication::translate("proftp", "Time", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(3, QApplication::translate("proftp", "Group", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(2, QApplication::translate("proftp", "Owner", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(1, QApplication::translate("proftp", "Size", 0, QApplication::UnicodeUTF8));
         ___qtreewidgetitem->setText(0, QApplication::translate("proftp", "Name", 0, QApplication::UnicodeUTF8));
+        buttonDownload->setText(QApplication::translate("proftp", "Download", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("proftp", "Local files :", 0, QApplication::UnicodeUTF8));
-        buttonReturnDirectory->setText(QString());
-        buttonAddFolderRemote->setText(QString());
-        buttonDeleteFolderRemote->setText(QString());
-        buttonConnectServer->setText(QApplication::translate("proftp", "Connect", 0, QApplication::UnicodeUTF8));
         buttonAddFolderLocal->setText(QString());
         buttonDeleteFolderLocal->setText(QString());
         buttonUpload->setText(QApplication::translate("proftp", "Upload", 0, QApplication::UnicodeUTF8));
+        buttonSync->setText(QApplication::translate("proftp", "Sync", 0, QApplication::UnicodeUTF8));
+        buttonSynchroniseFolders->setText(QApplication::translate("proftp", "Synchronise folders", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("proftp", "Remote files :", 0, QApplication::UnicodeUTF8));
+        label_11->setText(QApplication::translate("proftp", "Local files :", 0, QApplication::UnicodeUTF8));
         buttonHome->setText(QApplication::translate("proftp", "Home", 0, QApplication::UnicodeUTF8));
         buttonAddServer->setText(QApplication::translate("proftp", "Add this server", 0, QApplication::UnicodeUTF8));
         informationsServerBox->setTitle(QApplication::translate("proftp", "Informations", 0, QApplication::UnicodeUTF8));

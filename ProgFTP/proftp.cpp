@@ -30,6 +30,7 @@ proftp::proftp(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->windowServerManager->hide();
+    ui->windowSync->hide();
 
     setWindowTitle("ProgFTP");
 
@@ -47,36 +48,37 @@ proftp::proftp(QWidget *parent) :
 
     progressDialog = new QProgressDialog(this);
 
-    connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelDownload()));
+    connect(progressDialog, SIGNAL(canceled()), this, SLOT(cancelDownloadOrUpload()));
 
     QDirModel *model = new QDirModel(this);
 
     ui->localFolderView->setModel(model);
     ui->localFolderView->setEnabled(false);
 
-    ui->localFilesView->setModel(model);
     ui->localFilesView->setEnabled(false);
 
     dirModel = new QFileSystemModel(this);
     dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
 
-    fileModel = new QFileSystemModel(this);
-    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllEntries);
-
     ui->remoteFolderView->setEnabled(false);
     ui->remoteFolderView->setRootIsDecorated(false);
     ui->remoteFolderView->header()->setStretchLastSection(false);
 
-    connect(ui->remoteFolderView, SIGNAL(itemActivated(QTreeWidgetItem*,int)),
-            this, SLOT(processItem(QTreeWidgetItem*,int)));
+    connect(ui->remoteFolderView, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this, SLOT(processItem(QTreeWidgetItem*,int)));
+
+    ui->localFilesSync->setEnabled(false);
+    ui->remoteFilesSync->setEnabled(false);
 
     connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     proftp::loadServersList();
 
-    ui->serversList->setCurrentRow(0);
-    proftp::on_serversList_pressed();
+    if(ui->serversList->item(0))
+    {
+        ui->serversList->setCurrentRow(0);
+        proftp::on_serversList_pressed();
+    }
 
     if(QFile::exists("properties.ini"))
     {
@@ -108,8 +110,6 @@ void proftp::loadServersList()
     dir.absolutePath();
     QStringList list(dir.entryList());
 
-    qDebug() << list;
-
     ui->serversList->addItems(list);
     ui->serversSelect->addItems(list);
     ui->serversSelectProperties->addItems(list);
@@ -129,6 +129,10 @@ void proftp::on_buttonConnectServer_clicked()
         ui->localFolderView->setEnabled(false);
         ui->localFilesView->reset();
         ui->localFilesView->setEnabled(false);
+        ui->remoteFilesSync->clear();
+        ui->remoteFilesSync->setEnabled(false);
+        ui->localFilesSync->clear();
+        ui->localFilesSync->setEnabled(false);
         ui->actionConnect->setEnabled(true);
         ui->actionDisconnect->setEnabled(false);
         ui->actionSynchronise_folders->setEnabled(false);
@@ -164,8 +168,6 @@ void proftp::connectToFtp()
 
     dirModel->setRootPath(path);
 
-    fileModel->setRootPath(path);
-
     QModelIndex indexDir = dirModel->index(QString(settings.value("localfolder").toString()));
 
     ui->localFolderView->setModel(dirModel);
@@ -173,12 +175,39 @@ void proftp::connectToFtp()
     ui->localFolderView->scrollTo(indexDir);
     ui->localFolderView->setEnabled(true);
 
-    QModelIndex indexFile = fileModel->index(QString(settings.value("localfolder").toString()));
+    QDir dir(QString(settings.value("localfolder").toString()));
+    dir.absolutePath();
+    QStringList listLocalFiles(dir.entryList());
 
-    ui->localFilesView->setModel(fileModel);
+    ui->localFilesView->clear();
+    ui->localFilesView->addItems(listLocalFiles);
     ui->localFilesView->setEnabled(true);
 
+    for(int x = 0; x < ui->localFilesView->count(); x++)
+    {
+        QFileInfo fileInfo = ui->localFilesView->item(x)->text();
+
+        if(fileInfo.suffix() != "")
+        {
+            ui->localFilesView->item(x)->setIcon(QPixmap("images/file.png"));
+        }
+        else
+        {
+            ui->localFilesView->item(x)->setIcon(QPixmap("images/dir.png"));
+        }
+    }
+
     ui->remoteFolderView->clear();
+
+    QDir dirSync(QString(settings.value("localfolder").toString()));
+    dirSync.setFilter(QDir::Files);
+    dirSync.absolutePath();
+    QStringList listLocalFilesSync(dirSync.entryList());
+
+    ui->localFilesSync->addItems(listLocalFilesSync);
+    ui->localFilesSync->setEnabled(true);
+
+    ui->remoteFilesSync->clear();
 
     ui->logFTP->append("Attempt to connect to the server ...");
 
@@ -196,12 +225,9 @@ void proftp::connectToFtp()
 
     ftp = new QFtp(this);
 
-    connect(ftp, SIGNAL(commandFinished(int,bool)),
-            this, SLOT(ftpCommandFinished(int,bool)));
-    connect(ftp, SIGNAL(listInfo(QUrlInfo)),
-            this, SLOT(addToList(QUrlInfo)));
-    connect(ftp, SIGNAL(dataTransferProgress(qint64,qint64)),
-            this, SLOT(updateDataTransferProgress(qint64,qint64)));
+    connect(ftp, SIGNAL(commandFinished(int,bool)), this, SLOT(ftpCommandFinished(int,bool)));
+    connect(ftp, SIGNAL(listInfo(QUrlInfo)), this, SLOT(addToList(QUrlInfo)));
+    connect(ftp, SIGNAL(dataTransferProgress(qint64,qint64)), this, SLOT(updateDataTransferProgress(qint64,qint64)));
 
     ftp->connectToHost(QString(settings.value("adress").toString()), 21);
 
@@ -284,9 +310,9 @@ void proftp::on_buttonAddServer_clicked()
 {
     if(ui->addServerEdit->text() != "")
     {
-        nameFile = "servers/" + ui->addServerEdit->text() + ".ini";
+        nameFileSettings = "servers/" + ui->addServerEdit->text() + ".ini";
 
-        QSettings settings(nameFile, QSettings::IniFormat);
+        QSettings settings(nameFileSettings, QSettings::IniFormat);
         settings.setValue("name", ui->addServerEdit->text());
 
         ui->addServerEdit->clear();
@@ -317,7 +343,17 @@ void proftp::on_buttonChangeLocalFolder_clicked()
 {
     QString linkFolder = QFileDialog::getExistingDirectory(this,"Select this folder");
 
-    ui->localFolderLabel->setText(linkFolder);
+    if(linkFolder != "")
+    {
+        int sizeOfLinkFolder = linkFolder.length() -1;
+
+        if (QString(linkFolder.at(sizeOfLinkFolder)) != "/")
+        {
+            linkFolder.append("/");
+        }
+
+        ui->localFolderLabel->setText(linkFolder);
+    }
 }
 
 void proftp::on_buttonChangeRemoteFolder_clicked()
@@ -367,8 +403,6 @@ void proftp::on_buttonReturnDirectory_clicked()
     }
     ftp->list();
 
-    qDebug() << currentPath;
-
     ui->remoteFolderView->clear();
 }
 
@@ -390,6 +424,11 @@ void proftp::addToList(const QUrlInfo &urlInfo)
         ui->remoteFolderView->setCurrentItem(ui->remoteFolderView->topLevelItem(0));
         ui->remoteFolderView->setEnabled(true);
     }
+
+    QStringList listRemoteFiles(urlInfo.name());
+
+    ui->remoteFilesSync->addItems(listRemoteFiles);
+    ui->remoteFilesSync->setEnabled(true);
 }
 
 void proftp::processItem(QTreeWidgetItem *item, int /*column*/)
@@ -412,17 +451,81 @@ void proftp::on_localFolderView_clicked(const QModelIndex &index)
 {
     QString path = dirModel->fileInfo(index).absoluteFilePath();
 
-    ui->localFilesView->setRootIndex(fileModel->setRootPath(path));
+    linkLocalFolderView = path;
+
+    int sizeOfLinkLocalFolderView = linkLocalFolderView.length() -1;
+
+    if (QString(linkLocalFolderView.at(sizeOfLinkLocalFolderView)) != "/")
+    {
+        linkLocalFolderView.append("/");
+    }
+
+    QDir dir(path);
+    dir.absolutePath();
+    QStringList listLocalFiles(dir.entryList());
+
+    ui->localFilesView->clear();
+    ui->localFilesView->addItems(listLocalFiles);
+
+    for(int x = 0; x < ui->localFilesView->count(); x++)
+    {
+        QFileInfo fileInfo = ui->localFilesView->item(x)->text();
+
+        if(fileInfo.suffix() != "")
+        {
+            ui->localFilesView->item(x)->setIcon(QPixmap("images/file.png"));
+        }
+        else
+        {
+            ui->localFilesView->item(x)->setIcon(QPixmap("images/dir.png"));
+        }
+    }
 }
 
 void proftp::on_buttonSynchroniseFolders_clicked()
 {
+    for(int x = 0; x < ui->localFilesSync->count();  x++)
+    {
+        for(int y = 0; y < ui->remoteFilesSync->count(); y++)
+        {
+            if(ui->remoteFilesSync->item(y)->text() == ui->localFilesSync->item(x)->text())
+            {
+                ui->remoteFilesSync->item(y)->setText(ui->remoteFilesSync->item(y)->text() + " Synced");
+                ui->remoteFilesSync->item(y)->setIcon(QPixmap("images/sync.png"));
+            }
+        }
+    }
 
+    for(int x = 0; x < ui->remoteFilesSync->count(); x++)
+    {
+        if(!ui->remoteFilesSync->item(x)->text().contains("Synced", Qt::CaseInsensitive))
+        {
+            qDebug() << "good";
+
+            QString fileName = "D:/" + ui->remoteFilesSync->item(x)->text();
+
+            file = new QFile(fileName);
+            if (!file->open(QIODevice::WriteOnly)) {
+                QMessageBox::information(this, tr("FTP"),
+                                         tr("Unable to save the file %1: %2.")
+                                         .arg(fileName).arg(file->errorString()));
+                delete file;
+                return;
+            }
+
+            ftp->get(ui->remoteFilesSync->item(x)->text(), file);
+
+            progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
+            progressDialog->exec();
+        }
+    }
 }
 
 void proftp::on_buttonDownload_clicked()
 {
-    QString fileName = "D:/" + ui->remoteFolderView->currentItem()->text(0);
+    QString fileName = linkLocalFolderView  + ui->remoteFolderView->currentItem()->text(0);
+
+    qDebug() << linkLocalFolderView;
 
     if (QFile::exists(fileName))
     {
@@ -455,11 +558,13 @@ void proftp::on_buttonDownload_clicked()
 
 void proftp::on_buttonUpload_clicked()
 {
-    file = new QFile("D:/text.txt");
+    QString nameFile = linkLocalFolderView + ui->localFilesView->currentItem()->text();
+
+    file = new QFile(nameFile);
 
     if(file->open(QIODevice::ReadOnly))
     {
-        ftp->put(file, "test.txt");
+        ftp->put(file, ui->localFilesView->currentItem()->text());
 
         ui->buttonUpload->setEnabled(false);
 
@@ -587,7 +692,7 @@ void proftp::on_actionDisconnect_triggered()
 
 void proftp::on_actionSynchronise_folders_triggered()
 {
-
+    proftp::on_buttonSynchroniseFolders_clicked();
 }
 
 void proftp::on_actionDownload_file_triggered()
@@ -609,4 +714,20 @@ void proftp::on_actionHelp_triggered()
 void proftp::on_actionAbout_ProgFTP_triggered()
 {
     QProcess::execute("cmd /c start http://pox.alwaysdata.net/programs.php?p=progftp");
+}
+
+void proftp::on_buttonSync_clicked()
+{
+    if(ui->buttonSync->text() == "Sync")
+    {
+        ui->buttonSync->setText("Transfert");
+        ui->windowDataTransfert->hide();
+        ui->windowSync->show();
+    }
+    else
+    {
+        ui->buttonSync->setText("Sync");
+        ui->windowSync->hide();
+        ui->windowDataTransfert->show();
+    }
 }
