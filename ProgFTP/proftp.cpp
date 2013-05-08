@@ -107,12 +107,24 @@ void proftp::loadServersList()
     QDir dir("servers/");
     QStringList filters("*.ini" );
     dir.setNameFilters(filters);
-    dir.absolutePath();
     QStringList list(dir.entryList());
 
-    ui->serversList->addItems(list);
-    ui->serversSelect->addItems(list);
-    ui->serversSelectProperties->addItems(list);
+    QStringList listName;
+
+    for(int x = 0; x < list.count(); x++)
+    {
+        QFileInfo fileInfo = list.value(x);
+
+        QString test = fileInfo.baseName();
+
+        listName.append(fileInfo.baseName());
+
+        qDebug() << test;
+    }
+
+    ui->serversList->addItems(listName);
+    ui->serversSelect->addItems(listName);
+    ui->serversSelectProperties->addItems(listName);
 }
 
 void proftp::on_buttonConnectServer_clicked()
@@ -160,9 +172,9 @@ void proftp::on_buttonConnectServer_clicked()
 
 void proftp::connectToFtp()
 {
-    QString nameFileT = "servers/" + ui->serversSelect->currentText();
+    nameFileSettings = "servers/" + ui->serversSelect->currentText() + ".ini";
 
-    QSettings settings(nameFileT, QSettings::IniFormat);
+    QSettings settings(nameFileSettings, QSettings::IniFormat);
 
     QString path = settings.value("localfolder").toString();
 
@@ -327,21 +339,49 @@ void proftp::on_buttonAddServer_clicked()
 
 void proftp::on_buttonDeleteServers_clicked()
 {
-    QString nameFile = "servers/" + ui->serversList->currentItem()->text();
+    nameFileSettings = "servers/" + ui->serverNameLabel->text() + ".ini";
 
-    QFile(nameFile).remove();
+    QFile(nameFileSettings).remove();
 
     proftp::loadServersList();
 }
 
-void proftp::on_remoteFilesList_doubleClicked()
+void proftp::on_serversList_pressed()
 {
-    QMessageBox::information(this,"Information","You are selected an item.");
+    nameFileSettings = "servers/" + ui->serversList->currentItem()->text() + ".ini";
+
+    QSettings settings(nameFileSettings, QSettings::IniFormat);
+
+    ui->serverNameLabel->setText(QString(settings.value("name").toString()));
+    ui->serverAdressEdit->setText(QString(settings.value("adress").toString()));
+    ui->serverLoginEdit->setText(QString(settings.value("login").toString()));
+    ui->serverPasswordEdit->setText(QString(settings.value("password").toString()));
+    ui->serverPortEdit->setText(QString(settings.value("port").toString()));
+    ui->localFolderLabel->setText(QString(settings.value("localfolder").toString()));
+    ui->remoteFolderLabel->setText(QString(settings.value("remotefolder").toString()));
+}
+
+void proftp::on_serverAdressEdit_textChanged(const QString &arg1)
+{
+    proftp::saveChanges();
+}
+
+void proftp::on_serverLoginEdit_textChanged(const QString &arg1)
+{
+    proftp::saveChanges();
+}
+void proftp::on_serverPasswordEdit_textChanged(const QString &arg1)
+{
+    proftp::saveChanges();
+}
+void proftp::on_serverPortEdit_textChanged(const QString &arg1)
+{
+    proftp::saveChanges();
 }
 
 void proftp::on_buttonChangeLocalFolder_clicked()
 {
-    QString linkFolder = QFileDialog::getExistingDirectory(this,"Select this folder");
+    QString linkFolder = QFileDialog::getExistingDirectory(this,tr("Select this folder"));
 
     if(linkFolder != "")
     {
@@ -353,42 +393,34 @@ void proftp::on_buttonChangeLocalFolder_clicked()
         }
 
         ui->localFolderLabel->setText(linkFolder);
+
+        proftp::saveChanges();
     }
 }
 
 void proftp::on_buttonChangeRemoteFolder_clicked()
 {
+    QString linkFolder = QInputDialog::getText(this, tr("Remote link"), tr("Enter the remote link :"));
 
+    if(linkFolder != "")
+    {
+        ui->remoteFolderLabel->setText(linkFolder);
+
+        proftp::saveChanges();
+    }
 }
 
-void proftp::on_serversList_pressed()
+void proftp::saveChanges()
 {
-    QString nameFile = "servers/"+ ui->serversList->currentItem()->text();
+    nameFileSettings = "servers/" + ui->serversList->currentItem()->text() + ".ini";
 
-    QSettings settings(nameFile, QSettings::IniFormat);
-
-    ui->serverNameLabel->setText(QString(settings.value("name").toString()));
-    ui->serverAdressEdit->setText(QString(settings.value("adress").toString()));
-    ui->serverLoginEdit->setText(QString(settings.value("login").toString()));
-    ui->serverPasswordEdit->setText(QString(settings.value("password").toString()));
-    ui->serverPortEdit->setText(QString(settings.value("port").toString()));
-    ui->localFolderLabel->setText(QString(settings.value("localfolder").toString()));
-    ui->remoteFolderEdit->setText(QString(settings.value("remotefolder").toString()));
-}
-
-void proftp::on_buttonSaveChangesServer_clicked()
-{
-    QString nameFile = "servers/" + ui->serversList->currentItem()->text();
-
-    QSettings settings(nameFile, QSettings::IniFormat);
+    QSettings settings(nameFileSettings, QSettings::IniFormat);
     settings.setValue("adress", ui->serverAdressEdit->text());
     settings.setValue("login", ui->serverLoginEdit->text());
     settings.setValue("password", ui->serverPasswordEdit->text());
     settings.setValue("port", ui->serverPortEdit->text());
     settings.setValue("localfolder", ui->localFolderLabel->text());
-    settings.setValue("remotefolder", ui->remoteFolderEdit->text());
-
-    QMessageBox::information(this,"Information","Your changes has been saved");
+    settings.setValue("remotefolder", ui->remoteFolderLabel->text());
 }
 
 void proftp::on_buttonReturnDirectory_clicked()
@@ -484,6 +516,8 @@ void proftp::on_localFolderView_clicked(const QModelIndex &index)
 
 void proftp::on_buttonSynchroniseFolders_clicked()
 {
+    QStringList listSyncFiles;
+
     for(int x = 0; x < ui->localFilesSync->count();  x++)
     {
         for(int y = 0; y < ui->remoteFilesSync->count(); y++)
@@ -492,9 +526,13 @@ void proftp::on_buttonSynchroniseFolders_clicked()
             {
                 ui->remoteFilesSync->item(y)->setText(ui->remoteFilesSync->item(y)->text() + " Synced");
                 ui->remoteFilesSync->item(y)->setIcon(QPixmap("images/sync.png"));
+
+                listSyncFiles.append(ui->remoteFilesSync->item(y)->text());
             }
         }
     }
+
+    qDebug() << listSyncFiles;
 
     for(int x = 0; x < ui->remoteFilesSync->count(); x++)
     {
@@ -552,8 +590,6 @@ void proftp::on_buttonDownload_clicked()
 
     progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
     progressDialog->exec();
-
-    proftp::connectToFtp();
 }
 
 void proftp::on_buttonUpload_clicked()
@@ -600,13 +636,13 @@ void proftp::on_remoteFolderView_doubleClicked(const QModelIndex &index)
 {
     QFileInfo fileInfo = ui->remoteFolderView->currentItem()->text(0);
 
-    if(!fileInfo.isDir())
+    if(fileInfo.suffix() != "")
     {
         QString nameFileT = "servers/" + ui->serversSelect->currentText();
 
         QSettings settings(nameFileT, QSettings::IniFormat);
 
-        QString fileName = ui->remoteFolderView->currentItem()->text(0);
+        QString fileName = linkLocalFolderView  + ui->remoteFolderView->currentItem()->text(0);
 
         if (QFile::exists(fileName))
         {
@@ -633,6 +669,10 @@ void proftp::on_remoteFolderView_doubleClicked(const QModelIndex &index)
         progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
         ui->buttonDownload->setEnabled(false);
         progressDialog->exec();
+
+        QModelIndex index = ui->localFolderView->currentIndex();
+
+        proftp::on_localFolderView_clicked(index);
     }
 }
 

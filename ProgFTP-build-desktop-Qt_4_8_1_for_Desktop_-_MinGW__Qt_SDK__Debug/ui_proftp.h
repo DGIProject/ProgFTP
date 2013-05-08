@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'proftp.ui'
 **
-** Created: Mon May 6 19:16:06 2013
+** Created: Wed May 8 12:48:33 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -96,9 +96,8 @@ public:
     QPushButton *buttonChangeLocalFolder;
     QLabel *label_8;
     QPushButton *buttonChangeRemoteFolder;
-    QPushButton *buttonSaveChangesServer;
-    QLineEdit *remoteFolderEdit;
     QLabel *localFolderLabel;
+    QLabel *remoteFolderLabel;
     QGroupBox *propertiesBox;
     QCheckBox *autoLoginCheck;
     QComboBox *serversSelectProperties;
@@ -238,19 +237,22 @@ public:
         buttonAddServer->setGeometry(QRect(300, 10, 91, 21));
         serversList = new QListWidget(windowServerManager);
         serversList->setObjectName(QString::fromUtf8("serversList"));
-        serversList->setGeometry(QRect(10, 40, 121, 431));
+        serversList->setGeometry(QRect(10, 40, 101, 431));
         informationsServerBox = new QGroupBox(windowServerManager);
         informationsServerBox->setObjectName(QString::fromUtf8("informationsServerBox"));
-        informationsServerBox->setGeometry(QRect(140, 40, 251, 361));
+        informationsServerBox->setGeometry(QRect(130, 40, 261, 351));
         buttonDeleteServers = new QPushButton(informationsServerBox);
         buttonDeleteServers->setObjectName(QString::fromUtf8("buttonDeleteServers"));
-        buttonDeleteServers->setGeometry(QRect(110, 330, 101, 23));
+        buttonDeleteServers->setGeometry(QRect(230, 13, 21, 20));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8("../ProgFTP-build-desktop-Qt_4_8_1_for_Desktop_-_MinGW__Qt_SDK__Debug/images/notsync.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonDeleteServers->setIcon(icon);
         label_2 = new QLabel(informationsServerBox);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 20, 81, 16));
         serverNameLabel = new QLabel(informationsServerBox);
         serverNameLabel->setObjectName(QString::fromUtf8("serverNameLabel"));
-        serverNameLabel->setGeometry(QRect(100, 20, 141, 16));
+        serverNameLabel->setGeometry(QRect(100, 20, 121, 16));
         label_3 = new QLabel(informationsServerBox);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setGeometry(QRect(10, 50, 46, 13));
@@ -288,18 +290,15 @@ public:
         buttonChangeRemoteFolder = new QPushButton(informationsServerBox);
         buttonChangeRemoteFolder->setObjectName(QString::fromUtf8("buttonChangeRemoteFolder"));
         buttonChangeRemoteFolder->setGeometry(QRect(100, 290, 75, 23));
-        buttonSaveChangesServer = new QPushButton(informationsServerBox);
-        buttonSaveChangesServer->setObjectName(QString::fromUtf8("buttonSaveChangesServer"));
-        buttonSaveChangesServer->setGeometry(QRect(20, 330, 75, 23));
-        remoteFolderEdit = new QLineEdit(informationsServerBox);
-        remoteFolderEdit->setObjectName(QString::fromUtf8("remoteFolderEdit"));
-        remoteFolderEdit->setGeometry(QRect(100, 260, 141, 20));
         localFolderLabel = new QLabel(informationsServerBox);
         localFolderLabel->setObjectName(QString::fromUtf8("localFolderLabel"));
         localFolderLabel->setGeometry(QRect(100, 210, 141, 16));
+        remoteFolderLabel = new QLabel(informationsServerBox);
+        remoteFolderLabel->setObjectName(QString::fromUtf8("remoteFolderLabel"));
+        remoteFolderLabel->setGeometry(QRect(100, 260, 141, 20));
         propertiesBox = new QGroupBox(windowServerManager);
         propertiesBox->setObjectName(QString::fromUtf8("propertiesBox"));
-        propertiesBox->setGeometry(QRect(140, 400, 251, 71));
+        propertiesBox->setGeometry(QRect(130, 400, 261, 71));
         autoLoginCheck = new QCheckBox(propertiesBox);
         autoLoginCheck->setObjectName(QString::fromUtf8("autoLoginCheck"));
         autoLoginCheck->setGeometry(QRect(10, 30, 101, 18));
@@ -379,7 +378,7 @@ public:
         buttonHome->setText(QApplication::translate("proftp", "Home", 0, QApplication::UnicodeUTF8));
         buttonAddServer->setText(QApplication::translate("proftp", "Add this server", 0, QApplication::UnicodeUTF8));
         informationsServerBox->setTitle(QApplication::translate("proftp", "Informations", 0, QApplication::UnicodeUTF8));
-        buttonDeleteServers->setText(QApplication::translate("proftp", "Delete this server", 0, QApplication::UnicodeUTF8));
+        buttonDeleteServers->setText(QString());
         label_2->setText(QApplication::translate("proftp", "Nom du server :", 0, QApplication::UnicodeUTF8));
         serverNameLabel->setText(QApplication::translate("proftp", "servername", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("proftp", "Adresse :", 0, QApplication::UnicodeUTF8));
@@ -390,8 +389,8 @@ public:
         buttonChangeLocalFolder->setText(QApplication::translate("proftp", "Change", 0, QApplication::UnicodeUTF8));
         label_8->setText(QApplication::translate("proftp", "Remote folder :", 0, QApplication::UnicodeUTF8));
         buttonChangeRemoteFolder->setText(QApplication::translate("proftp", "Change", 0, QApplication::UnicodeUTF8));
-        buttonSaveChangesServer->setText(QApplication::translate("proftp", "Save changes", 0, QApplication::UnicodeUTF8));
         localFolderLabel->setText(QApplication::translate("proftp", "localfolder", 0, QApplication::UnicodeUTF8));
+        remoteFolderLabel->setText(QApplication::translate("proftp", "remotefolder", 0, QApplication::UnicodeUTF8));
         propertiesBox->setTitle(QApplication::translate("proftp", "Properties", 0, QApplication::UnicodeUTF8));
         autoLoginCheck->setText(QApplication::translate("proftp", "Auto-login with", 0, QApplication::UnicodeUTF8));
         menuHome->setTitle(QApplication::translate("proftp", "Home", 0, QApplication::UnicodeUTF8));

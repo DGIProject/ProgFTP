@@ -21,6 +21,7 @@
 #include <QHash>
 #include <QFileSystemModel>
 #include <QProgressDialog>
+#include <QThread>
 
 namespace Ui {
 class proftp;
@@ -47,15 +48,21 @@ private slots:
 
     void on_buttonDeleteServers_clicked();
 
-    void on_remoteFilesList_doubleClicked();
+    void on_serversList_pressed();
+
+    void on_serverAdressEdit_textChanged(const QString &arg1);
+
+    void on_serverLoginEdit_textChanged(const QString &arg1);
+
+    void on_serverPasswordEdit_textChanged(const QString &arg1);
+
+    void on_serverPortEdit_textChanged(const QString &arg1);
 
     void on_buttonChangeLocalFolder_clicked();
 
     void on_buttonChangeRemoteFolder_clicked();
 
-    void on_serversList_pressed();
-
-    void on_buttonSaveChangesServer_clicked();
+    void saveChanges();
 
     void on_buttonReturnDirectory_clicked();
 
