@@ -15,10 +15,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         proftp.cpp \
-    windowhelp.cpp
+    windowhelp.cpp \
+    windowlogs.cpp \
+    windowaddserver.cpp
 
 HEADERS  += proftp.h \
-    windowhelp.h
+    windowhelp.h \
+    windowlogs.h \
+    windowaddserver.h
 
 FORMS    += proftp.ui \
-    windowhelp.ui
+    windowhelp.ui \
+    windowlogs.ui \
+    windowaddserver.ui

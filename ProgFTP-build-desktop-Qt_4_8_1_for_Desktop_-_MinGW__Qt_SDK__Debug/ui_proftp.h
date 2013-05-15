@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'proftp.ui'
 **
-** Created: Wed May 8 12:48:33 2013
+** Created: Mon May 13 19:29:26 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -26,6 +26,7 @@
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
 #include <QtGui/QPushButton>
+#include <QtGui/QTextBrowser>
 #include <QtGui/QTextEdit>
 #include <QtGui/QTreeView>
 #include <QtGui/QTreeWidget>
@@ -47,10 +48,11 @@ public:
     QAction *actionAbout_ProgFTP;
     QAction *actionAbout_Qt;
     QAction *actionUpload_file;
+    QAction *actionHome;
     QWidget *centralWidget;
     QWidget *windowHome;
     QPushButton *buttonServerManager;
-    QTextEdit *logFTP;
+    QTextEdit *logsFTP;
     QFrame *line;
     QComboBox *serversSelect;
     QPushButton *buttonConnectServer;
@@ -101,6 +103,7 @@ public:
     QGroupBox *propertiesBox;
     QCheckBox *autoLoginCheck;
     QComboBox *serversSelectProperties;
+    QTextBrowser *addServerText;
     QMenuBar *menuBar;
     QMenu *menuHome;
     QMenu *menuServer;
@@ -135,6 +138,8 @@ public:
         actionAbout_Qt->setObjectName(QString::fromUtf8("actionAbout_Qt"));
         actionUpload_file = new QAction(proftp);
         actionUpload_file->setObjectName(QString::fromUtf8("actionUpload_file"));
+        actionHome = new QAction(proftp);
+        actionHome->setObjectName(QString::fromUtf8("actionHome"));
         centralWidget = new QWidget(proftp);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         windowHome = new QWidget(centralWidget);
@@ -143,10 +148,10 @@ public:
         buttonServerManager = new QPushButton(windowHome);
         buttonServerManager->setObjectName(QString::fromUtf8("buttonServerManager"));
         buttonServerManager->setGeometry(QRect(10, 10, 91, 23));
-        logFTP = new QTextEdit(windowHome);
-        logFTP->setObjectName(QString::fromUtf8("logFTP"));
-        logFTP->setGeometry(QRect(10, 40, 411, 61));
-        logFTP->setTextInteractionFlags(Qt::NoTextInteraction);
+        logsFTP = new QTextEdit(windowHome);
+        logsFTP->setObjectName(QString::fromUtf8("logsFTP"));
+        logsFTP->setGeometry(QRect(10, 40, 411, 61));
+        logsFTP->setTextInteractionFlags(Qt::NoTextInteraction);
         line = new QFrame(windowHome);
         line->setObjectName(QString::fromUtf8("line"));
         line->setGeometry(QRect(180, 10, 16, 21));
@@ -305,6 +310,10 @@ public:
         serversSelectProperties = new QComboBox(propertiesBox);
         serversSelectProperties->setObjectName(QString::fromUtf8("serversSelectProperties"));
         serversSelectProperties->setGeometry(QRect(110, 30, 121, 22));
+        addServerText = new QTextBrowser(windowServerManager);
+        addServerText->setObjectName(QString::fromUtf8("addServerText"));
+        addServerText->setGeometry(QRect(150, 180, 221, 31));
+        addServerText->setFrameShape(QFrame::NoFrame);
         proftp->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(proftp);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -320,6 +329,7 @@ public:
         menuBar->addAction(menuHome->menuAction());
         menuBar->addAction(menuServer->menuAction());
         menuBar->addAction(menuHelp->menuAction());
+        menuHome->addAction(actionHome);
         menuHome->addAction(actionServer_manager);
         menuHome->addSeparator();
         menuHome->addAction(actionLogs);
@@ -354,6 +364,7 @@ public:
         actionAbout_ProgFTP->setText(QApplication::translate("proftp", "About ProgFTP", 0, QApplication::UnicodeUTF8));
         actionAbout_Qt->setText(QApplication::translate("proftp", "About Qt", 0, QApplication::UnicodeUTF8));
         actionUpload_file->setText(QApplication::translate("proftp", "Upload file", 0, QApplication::UnicodeUTF8));
+        actionHome->setText(QApplication::translate("proftp", "Home", 0, QApplication::UnicodeUTF8));
         buttonServerManager->setText(QApplication::translate("proftp", "Server manager", 0, QApplication::UnicodeUTF8));
         buttonConnectServer->setText(QApplication::translate("proftp", "Connect", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("proftp", "Remote files :", 0, QApplication::UnicodeUTF8));
@@ -380,7 +391,7 @@ public:
         informationsServerBox->setTitle(QApplication::translate("proftp", "Informations", 0, QApplication::UnicodeUTF8));
         buttonDeleteServers->setText(QString());
         label_2->setText(QApplication::translate("proftp", "Nom du server :", 0, QApplication::UnicodeUTF8));
-        serverNameLabel->setText(QApplication::translate("proftp", "servername", 0, QApplication::UnicodeUTF8));
+        serverNameLabel->setText(QString());
         label_3->setText(QApplication::translate("proftp", "Adresse :", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("proftp", "Login :", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("proftp", "Password :", 0, QApplication::UnicodeUTF8));
@@ -389,10 +400,15 @@ public:
         buttonChangeLocalFolder->setText(QApplication::translate("proftp", "Change", 0, QApplication::UnicodeUTF8));
         label_8->setText(QApplication::translate("proftp", "Remote folder :", 0, QApplication::UnicodeUTF8));
         buttonChangeRemoteFolder->setText(QApplication::translate("proftp", "Change", 0, QApplication::UnicodeUTF8));
-        localFolderLabel->setText(QApplication::translate("proftp", "localfolder", 0, QApplication::UnicodeUTF8));
-        remoteFolderLabel->setText(QApplication::translate("proftp", "remotefolder", 0, QApplication::UnicodeUTF8));
+        localFolderLabel->setText(QString());
+        remoteFolderLabel->setText(QApplication::translate("proftp", "/", 0, QApplication::UnicodeUTF8));
         propertiesBox->setTitle(QApplication::translate("proftp", "Properties", 0, QApplication::UnicodeUTF8));
         autoLoginCheck->setText(QApplication::translate("proftp", "Auto-login with", 0, QApplication::UnicodeUTF8));
+        addServerText->setHtml(QApplication::translate("proftp", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">You must to add at least one FTP server.</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         menuHome->setTitle(QApplication::translate("proftp", "Home", 0, QApplication::UnicodeUTF8));
         menuServer->setTitle(QApplication::translate("proftp", "Server", 0, QApplication::UnicodeUTF8));
         menuHelp->setTitle(QApplication::translate("proftp", "Help", 0, QApplication::UnicodeUTF8));

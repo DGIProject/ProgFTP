@@ -35,9 +35,9 @@ public:
     explicit proftp(QWidget *parent = 0);
     ~proftp();
 
-private slots:
     void loadServersList();
 
+private slots:
     void on_buttonConnectServer_clicked();
 
     void connectToFtp();
@@ -50,13 +50,13 @@ private slots:
 
     void on_serversList_pressed();
 
-    void on_serverAdressEdit_textChanged(const QString &arg1);
+    void on_serverAdressEdit_editingFinished();
 
-    void on_serverLoginEdit_textChanged(const QString &arg1);
+    void on_serverLoginEdit_editingFinished();
 
-    void on_serverPasswordEdit_textChanged(const QString &arg1);
+    void on_serverPasswordEdit_editingFinished();
 
-    void on_serverPortEdit_textChanged(const QString &arg1);
+    void on_serverPortEdit_editingFinished();
 
     void on_buttonChangeLocalFolder_clicked();
 
@@ -84,13 +84,15 @@ private slots:
 
     void on_remoteFolderView_doubleClicked(const QModelIndex &index);
 
-    void on_buttonServerManager_clicked();
-
     void on_buttonHome_clicked();
+
+    void on_buttonServerManager_clicked();
 
     void on_autoLoginCheck_clicked();
 
     void on_serversSelectProperties_currentIndexChanged();
+
+    void on_actionHome_triggered();
 
     void on_actionServer_manager_triggered();
 
@@ -111,6 +113,8 @@ private slots:
     void on_actionAbout_ProgFTP_triggered();
 
     void on_buttonSync_clicked();
+
+    void on_logsFTP_textChanged();
 
 private:
     Ui::proftp *ui;

@@ -1,6 +1,8 @@
 #include "proftp.h"
 #include "ui_proftp.h"
 #include "windowhelp.h"
+#include "windowlogs.h"
+#include "windowaddserver.h"
 #include <QSettings>
 #include <QMessageBox>
 #include <QDir>
@@ -31,8 +33,11 @@ proftp::proftp(QWidget *parent) :
     ui->setupUi(this);
     ui->windowServerManager->hide();
     ui->windowSync->hide();
+    ui->addServerText->hide();
 
     setWindowTitle("ProgFTP");
+
+    ui->actionHome->setEnabled(false);
 
     ui->actionDisconnect->setEnabled(false);
     ui->actionSynchronise_folders->setEnabled(false);
@@ -79,6 +84,12 @@ proftp::proftp(QWidget *parent) :
         ui->serversList->setCurrentRow(0);
         proftp::on_serversList_pressed();
     }
+    else
+    {
+        ui->addServerText->show();
+        ui->informationsServerBox->hide();
+        ui->propertiesBox->hide();
+    }
 
     if(QFile::exists("properties.ini"))
     {
@@ -118,8 +129,6 @@ void proftp::loadServersList()
         QString test = fileInfo.baseName();
 
         listName.append(fileInfo.baseName());
-
-        qDebug() << test;
     }
 
     ui->serversList->addItems(listName);
@@ -152,7 +161,8 @@ void proftp::on_buttonConnectServer_clicked()
         ui->actionUpload_file->setEnabled(false);
         ui->buttonSynchroniseFolders->setEnabled(false);
         ui->buttonDownload->setEnabled(false);
-        ui->logFTP->append("Stopping ftp connection");
+        ui->buttonUpload->setEnabled(false);
+        ui->logsFTP->append("Stopping ftp connection");
         ui->buttonConnectServer->setText("Connect");
 
         statut = 0;
@@ -221,7 +231,7 @@ void proftp::connectToFtp()
 
     ui->remoteFilesSync->clear();
 
-    ui->logFTP->append("Attempt to connect to the server ...");
+    ui->logsFTP->append("Attempt to connect to the server ...");
 
     ui->actionDisconnect->setEnabled(true);
     ui->actionSynchronise_folders->setEnabled(true);
@@ -261,10 +271,12 @@ void proftp::ftpCommandFinished(int, bool error)
     {
         if (error)
         {
-            ui->logFTP->append("<span style=\"color: red\">Unabled to connect to the server</span>");
+            ui->logsFTP->append("<span style=\"color: red\">Unabled to connect to the server</span>");
         }
-
-        ui->logFTP->append("<span style=\"color: green\">Connected from the server</span>");
+        else
+        {
+            ui->logsFTP->append("<span style=\"color: green\">Connected from the server</span>");
+        }
     }
 
     if (ftp->currentCommand() == QFtp::Login)
@@ -274,13 +286,13 @@ void proftp::ftpCommandFinished(int, bool error)
     {
         if (error)
         {
-            ui->logFTP->append(tr("<span style=\"color: red\">Canceled download</span>"));
+            ui->logsFTP->append(tr("<span style=\"color: red\">Canceled download</span>"));
             file->close();
             file->remove();
         }
         else
         {
-            ui->logFTP->append(tr("<span style=\"color: green\">Downloaded to current directory</span>"));
+            ui->logsFTP->append(tr("<span style=\"color: green\">Downloaded to current directory</span>"));
             file->close();
         }
 
@@ -293,13 +305,13 @@ void proftp::ftpCommandFinished(int, bool error)
     {
         if (error)
         {
-            ui->logFTP->append(tr("<span style=\"color: red\">Canceled upload</span>"));
+            ui->logsFTP->append(tr("<span style=\"color: red\">Canceled upload</span>"));
             file->close();
             file->remove();
         }
         else
         {
-            ui->logFTP->append(tr("<span style=\"color: green\">Upload the current directory</span>"));
+            ui->logsFTP->append(tr("<span style=\"color: green\">Upload the current directory</span>"));
             file->close();
         }
 
@@ -327,7 +339,14 @@ void proftp::on_buttonAddServer_clicked()
         QSettings settings(nameFileSettings, QSettings::IniFormat);
         settings.setValue("name", ui->addServerEdit->text());
 
+        windowAddServer *addServer = new windowAddServer(this, ui->addServerEdit->text());
+        addServer->show();
+
         ui->addServerEdit->clear();
+
+        ui->informationsServerBox->show();
+        ui->propertiesBox->show();
+        ui->addServerText->hide();
     }
     else
     {
@@ -361,20 +380,22 @@ void proftp::on_serversList_pressed()
     ui->remoteFolderLabel->setText(QString(settings.value("remotefolder").toString()));
 }
 
-void proftp::on_serverAdressEdit_textChanged(const QString &arg1)
+void proftp::on_serverAdressEdit_editingFinished()
 {
     proftp::saveChanges();
 }
 
-void proftp::on_serverLoginEdit_textChanged(const QString &arg1)
+void proftp::on_serverLoginEdit_editingFinished()
 {
     proftp::saveChanges();
 }
-void proftp::on_serverPasswordEdit_textChanged(const QString &arg1)
+
+void proftp::on_serverPasswordEdit_editingFinished()
 {
     proftp::saveChanges();
 }
-void proftp::on_serverPortEdit_textChanged(const QString &arg1)
+
+void proftp::on_serverPortEdit_editingFinished()
 {
     proftp::saveChanges();
 }
@@ -475,8 +496,6 @@ void proftp::processItem(QTreeWidgetItem *item, int /*column*/)
         ftp->list();
         ui->buttonReturnDirectory->setEnabled(true);
     }
-
-    qDebug() << currentPath;
 }
 
 void proftp::on_localFolderView_clicked(const QModelIndex &index)
@@ -588,15 +607,16 @@ void proftp::on_buttonDownload_clicked()
 
     ui->buttonDownload->setEnabled(false);
 
+    ui->logsFTP->append(tr("Downloading ...").arg(fileName));
     progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
     progressDialog->exec();
 }
 
 void proftp::on_buttonUpload_clicked()
 {
-    QString nameFile = linkLocalFolderView + ui->localFilesView->currentItem()->text();
+    QString fileName = linkLocalFolderView + ui->localFilesView->currentItem()->text();
 
-    file = new QFile(nameFile);
+    file = new QFile(fileName);
 
     if(file->open(QIODevice::ReadOnly))
     {
@@ -604,6 +624,7 @@ void proftp::on_buttonUpload_clicked()
 
         ui->buttonUpload->setEnabled(false);
 
+        ui->logsFTP->append(tr("Uploading ...").arg(fileName));
         progressDialog->setLabelText(tr("Uploading ..."));
         progressDialog->exec();
 
@@ -665,7 +686,7 @@ void proftp::on_remoteFolderView_doubleClicked(const QModelIndex &index)
 
         ftp->get(ui->remoteFolderView->currentItem()->text(0), file);
 
-        ui->logFTP->append(tr("Downloading ...").arg(fileName));
+        ui->logsFTP->append(tr("Downloading ...").arg(fileName));
         progressDialog->setLabelText(tr("Downloading ...").arg(fileName));
         ui->buttonDownload->setEnabled(false);
         progressDialog->exec();
@@ -676,16 +697,22 @@ void proftp::on_remoteFolderView_doubleClicked(const QModelIndex &index)
     }
 }
 
-void proftp::on_buttonServerManager_clicked()
-{
-    ui->windowHome->hide();
-    ui->windowServerManager->show();
-}
-
 void proftp::on_buttonHome_clicked()
 {
+    ui->actionServer_manager->setEnabled(true);
+    ui->actionHome->setEnabled(false);
+
     ui->windowServerManager->hide();
     ui->windowHome->show();
+}
+
+void proftp::on_buttonServerManager_clicked()
+{
+    ui->actionHome->setEnabled(true);
+    ui->actionServer_manager->setEnabled(false);
+
+    ui->windowHome->hide();
+    ui->windowServerManager->show();
 }
 
 void proftp::on_autoLoginCheck_clicked()
@@ -710,6 +737,11 @@ void proftp::on_serversSelectProperties_currentIndexChanged()
     settings.setValue("servername", ui->serversSelectProperties->currentText());
 }
 
+void proftp::on_actionHome_triggered()
+{
+    proftp::on_buttonHome_clicked();
+}
+
 void proftp::on_actionServer_manager_triggered()
 {
     proftp::on_buttonServerManager_clicked();
@@ -717,7 +749,15 @@ void proftp::on_actionServer_manager_triggered()
 
 void proftp::on_actionLogs_triggered()
 {
-
+    if(QFile::exists("progftp.log"))
+    {
+        windowLogs *logs = new windowLogs(this);
+        logs->show();
+    }
+    else
+    {
+        QMessageBox::critical(this,"Error","The log file doesn't exist");
+    }
 }
 
 void proftp::on_actionConnect_triggered()
@@ -769,5 +809,35 @@ void proftp::on_buttonSync_clicked()
         ui->buttonSync->setText("Sync");
         ui->windowSync->hide();
         ui->windowDataTransfert->show();
+    }
+}
+
+void proftp::on_logsFTP_textChanged()
+{
+    qDebug() << "textchanged";
+
+    QFile file("progftp.log");
+
+    QString logsDateTime = "[" + QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss") + "] ";
+
+    QString logsText = ui->logsFTP->toPlainText();
+
+    int pos = logsText.lastIndexOf("\n");
+
+    QString result = logsText.right(pos);
+
+    qDebug() << result;
+
+    qDebug() << pos;
+
+    qDebug() << logsText;
+
+    if (file.open(QIODevice::Append | QIODevice::Text))
+    {
+        QTextStream flux(&file);
+
+        flux.setCodec("UTF-8");
+
+        flux << logsDateTime << ui->logsFTP->toPlainText() << endl;
     }
 }

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'windowhelp.ui'
 **
-** Created: Fri May 3 19:13:40 2013
+** Created: Sun May 12 19:00:52 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -17,6 +17,7 @@
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QHeaderView>
+#include <QtGui/QTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -24,17 +25,23 @@ class Ui_windowHelp
 {
 public:
     QDialogButtonBox *buttonBox;
+    QTextEdit *helpEdit;
 
     void setupUi(QDialog *windowHelp)
     {
         if (windowHelp->objectName().isEmpty())
             windowHelp->setObjectName(QString::fromUtf8("windowHelp"));
-        windowHelp->resize(400, 300);
+        windowHelp->resize(538, 521);
+        windowHelp->setMinimumSize(QSize(538, 521));
+        windowHelp->setMaximumSize(QSize(538, 521));
         buttonBox = new QDialogButtonBox(windowHelp);
         buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(30, 240, 341, 32));
+        buttonBox->setGeometry(QRect(370, 481, 161, 41));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+        helpEdit = new QTextEdit(windowHelp);
+        helpEdit->setObjectName(QString::fromUtf8("helpEdit"));
+        helpEdit->setGeometry(QRect(0, 0, 541, 481));
 
         retranslateUi(windowHelp);
         QObject::connect(buttonBox, SIGNAL(accepted()), windowHelp, SLOT(accept()));
