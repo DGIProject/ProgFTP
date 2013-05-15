@@ -1,7 +1,7 @@
 ProgFTP
 =======
 
-ProgFTP est un programme qui vous permet de synchroniser vos fichiers à partie de serveurs FTP.
+ProgFTP est un programme qui vous permet de synchroniser vos fichiers à partir de serveurs FTP.
 
 Fonctionnement
 ==============
