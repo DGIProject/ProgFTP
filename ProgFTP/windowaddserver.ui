@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>261</width>
+    <width>655</width>
     <height>328</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>261</width>
+    <width>55555</width>
     <height>328</height>
    </size>
   </property>
@@ -168,8 +168,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QWidget" name="windowEnterBase" native="true">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
+     <x>320</x>
+     <y>10</y>
      <width>261</width>
      <height>301</height>
     </rect>
@@ -185,19 +185,6 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>Server name :</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="serverNameLabel">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>40</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>servername</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -322,6 +309,19 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>Add new server</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="serverNameLabel">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>40</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>servername</string>
     </property>
    </widget>
   </widget>

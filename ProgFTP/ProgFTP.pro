@@ -28,3 +28,9 @@ FORMS    += proftp.ui \
     windowhelp.ui \
     windowlogs.ui \
     windowaddserver.ui
+
+OTHER_FILES += \
+    img/file.png
+
+RESOURCES += \
+    proftp.qrc

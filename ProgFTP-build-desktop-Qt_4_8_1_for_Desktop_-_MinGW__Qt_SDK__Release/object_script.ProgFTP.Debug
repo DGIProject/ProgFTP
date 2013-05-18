@@ -1,0 +1,12 @@
+INPUT(
+./debug\main.o
+./debug\proftp.o
+./debug\windowhelp.o
+./debug\windowlogs.o
+./debug\windowaddserver.o
+./debug\moc_proftp.o
+./debug\moc_windowhelp.o
+./debug\moc_windowlogs.o
+./debug\moc_windowaddserver.o
+./debug\qrc_proftp.o
+);

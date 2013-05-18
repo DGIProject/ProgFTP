@@ -22,6 +22,7 @@
 #include <QFileSystemModel>
 #include <QProgressDialog>
 #include <QThread>
+#include <QSystemTrayIcon>
 
 namespace Ui {
 class proftp;
@@ -116,6 +117,18 @@ private slots:
 
     void on_logsFTP_textChanged();
 
+    void on_buttonGoToProgFTP_clicked();
+
+    void on_buttonForum_clicked();
+
+    void on_buttonHelp_clicked();
+
+    void on_buttonAboutProgFTP_clicked();
+
+    void on_buttonRefreshServeurs_clicked();
+
+    void hideShowWindow();
+
 private:
     Ui::proftp *ui;
 
@@ -133,7 +146,19 @@ public:
     QString nameFileSettings;
     QString linkLocalFolderView;
 
+    QSystemTrayIcon *sticon;
+    QMenu *stmenu;
+    QMenu *menuServer;
+    QAction *actionHideShowWindow;
+    QAction *actionExit;
+    QAction *actionConnectToLastServer;
+    QAction *actionDisconnectToLastServer;
+    QAction *actionSyncFiles;
+
     int statut;
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 };
 

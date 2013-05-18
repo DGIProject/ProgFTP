@@ -1,0 +1,12 @@
+INPUT(
+./release\main.o
+./release\proftp.o
+./release\windowhelp.o
+./release\windowlogs.o
+./release\windowaddserver.o
+./release\moc_proftp.o
+./release\moc_windowhelp.o
+./release\moc_windowlogs.o
+./release\moc_windowaddserver.o
+./release\qrc_proftp.o
+);

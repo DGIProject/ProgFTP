@@ -9,6 +9,8 @@ windowAddServer::windowAddServer(QWidget *parent, QString serverName) :
 {
     ui->setupUi(this);
 
+    setWindowTitle("Add server - ProgFTP");
+
     ui->windowEnterSyncModule->hide();
 
     ui->serverNameLabel->setText(serverName);

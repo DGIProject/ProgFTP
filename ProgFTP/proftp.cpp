@@ -25,6 +25,7 @@
 #include <QHash>
 #include <QFileSystemModel>
 #include <QProgressDialog>
+#include <QSystemTrayIcon>
 
 proftp::proftp(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +34,7 @@ proftp::proftp(QWidget *parent) :
     ui->setupUi(this);
     ui->windowServerManager->hide();
     ui->windowSync->hide();
-    ui->addServerText->hide();
+    ui->windowStart->hide();
 
     setWindowTitle("ProgFTP");
 
@@ -49,7 +50,7 @@ proftp::proftp(QWidget *parent) :
     ui->buttonUpload->setEnabled(false);
     ui->buttonReturnDirectory->setEnabled(false);
 
-    ui->buttonReturnDirectory->setIcon(QPixmap("images/cdtoparent.png"));
+    ui->buttonReturnDirectory->setIcon(QPixmap(":/img/cdtoparent.png"));
 
     progressDialog = new QProgressDialog(this);
 
@@ -74,6 +75,8 @@ proftp::proftp(QWidget *parent) :
     ui->localFilesSync->setEnabled(false);
     ui->remoteFilesSync->setEnabled(false);
 
+    connect(ui->buttonAboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
+
     connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 
@@ -86,9 +89,11 @@ proftp::proftp(QWidget *parent) :
     }
     else
     {
-        ui->addServerText->show();
-        ui->informationsServerBox->hide();
-        ui->propertiesBox->hide();
+        ui->menuBar->setEnabled(false);
+
+        ui->windowHome->hide();
+        ui->windowServerManager->hide();
+        ui->windowStart->show();
     }
 
     if(QFile::exists("properties.ini"))
@@ -102,6 +107,26 @@ proftp::proftp(QWidget *parent) :
             proftp::on_buttonConnectServer_clicked();
         }
     }
+
+    sticon = new QSystemTrayIcon(QIcon(":/img/icon.png"), this);
+
+    stmenu = new QMenu(this);
+
+    menuServer = stmenu->addMenu("Server");
+
+    actionConnectToLastServer = menuServer->addAction("Connect");
+    actionDisconnectToLastServer = menuServer->addAction("Disconnect");
+    actionSyncFiles = menuServer->addAction("Sync files");
+
+    actionHideShowWindow = stmenu->addAction("Hide window");
+    actionExit = stmenu->addAction("Exit");
+
+    sticon->setContextMenu(stmenu);
+    sticon->show();
+
+    connect(actionHideShowWindow, SIGNAL(triggered()), this, SLOT(hideShowWindow()));
+
+    connect(actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
 }
 
 proftp::~proftp()
@@ -211,11 +236,11 @@ void proftp::connectToFtp()
 
         if(fileInfo.suffix() != "")
         {
-            ui->localFilesView->item(x)->setIcon(QPixmap("images/file.png"));
+            ui->localFilesView->item(x)->setIcon(QPixmap(":/img/file.png"));
         }
         else
         {
-            ui->localFilesView->item(x)->setIcon(QPixmap("images/dir.png"));
+            ui->localFilesView->item(x)->setIcon(QPixmap(":/img/dir.png"));
         }
     }
 
@@ -343,10 +368,6 @@ void proftp::on_buttonAddServer_clicked()
         addServer->show();
 
         ui->addServerEdit->clear();
-
-        ui->informationsServerBox->show();
-        ui->propertiesBox->show();
-        ui->addServerText->hide();
     }
     else
     {
@@ -358,11 +379,18 @@ void proftp::on_buttonAddServer_clicked()
 
 void proftp::on_buttonDeleteServers_clicked()
 {
-    nameFileSettings = "servers/" + ui->serverNameLabel->text() + ".ini";
+    if(ui->serversList->count() != 1)
+    {
+        nameFileSettings = "servers/" + ui->serverNameLabel->text() + ".ini";
 
-    QFile(nameFileSettings).remove();
+        QFile(nameFileSettings).remove();
 
-    proftp::loadServersList();
+        proftp::loadServersList();
+    }
+    else
+    {
+        QMessageBox::critical(this,"Error","You need to have at least one FTP server");
+    }
 }
 
 void proftp::on_serversList_pressed()
@@ -468,7 +496,7 @@ void proftp::addToList(const QUrlInfo &urlInfo)
     item->setText(3, urlInfo.group());
     item->setText(4, urlInfo.lastModified().toString("MMM dd yyyy"));
 
-    QPixmap pixmap(urlInfo.isDir() ? "images/dir.png" : "images/file.png");
+    QPixmap pixmap(urlInfo.isDir() ? ":/img/dir.png" : ":/img/file.png");
     item->setIcon(0, pixmap);
 
     isDirectory[urlInfo.name()] = urlInfo.isDir();
@@ -524,11 +552,11 @@ void proftp::on_localFolderView_clicked(const QModelIndex &index)
 
         if(fileInfo.suffix() != "")
         {
-            ui->localFilesView->item(x)->setIcon(QPixmap("images/file.png"));
+            ui->localFilesView->item(x)->setIcon(QPixmap(":/img/file.png"));
         }
         else
         {
-            ui->localFilesView->item(x)->setIcon(QPixmap("images/dir.png"));
+            ui->localFilesView->item(x)->setIcon(QPixmap(":/img/dir.png"));
         }
     }
 }
@@ -544,7 +572,7 @@ void proftp::on_buttonSynchroniseFolders_clicked()
             if(ui->remoteFilesSync->item(y)->text() == ui->localFilesSync->item(x)->text())
             {
                 ui->remoteFilesSync->item(y)->setText(ui->remoteFilesSync->item(y)->text() + " Synced");
-                ui->remoteFilesSync->item(y)->setIcon(QPixmap("images/sync.png"));
+                ui->remoteFilesSync->item(y)->setIcon(QPixmap(":/img/sync.png"));
 
                 listSyncFiles.append(ui->remoteFilesSync->item(y)->text());
             }
@@ -787,8 +815,8 @@ void proftp::on_actionUpload_file_triggered()
 
 void proftp::on_actionHelp_triggered()
 {
-    windowHelp *w = new windowHelp(this);
-    w->show();
+    windowHelp *help = new windowHelp(this);
+    help->show();
 }
 
 void proftp::on_actionAbout_ProgFTP_triggered()
@@ -840,4 +868,94 @@ void proftp::on_logsFTP_textChanged()
 
         flux << logsDateTime << ui->logsFTP->toPlainText() << endl;
     }
+}
+
+void proftp::on_buttonGoToProgFTP_clicked()
+{
+    if(ui->addNewServerEdit->text() != "")
+    {
+        ui->menuBar->setEnabled(true);
+
+        ui->windowStart->hide();
+        ui->windowServerManager->hide();
+        ui->windowHome->show();
+
+        nameFileSettings = "servers/" + ui->addNewServerEdit->text() + ".ini";
+
+        QSettings settings(nameFileSettings, QSettings::IniFormat);
+        settings.setValue("name", ui->addNewServerEdit->text());
+
+        windowAddServer *addServer = new windowAddServer(this, ui->addNewServerEdit->text());
+        addServer->show();
+
+        ui->addNewServerEdit->clear();
+    }
+    else
+    {
+        QMessageBox::critical(this,"Error","You need to enter a server name");
+    }
+
+    proftp::loadServersList();
+}
+
+void proftp::on_buttonForum_clicked()
+{
+    QProcess::execute("cmd /c start http://pox.alwaysdata.net/forum.php?p=progftp");
+}
+
+void proftp::on_buttonHelp_clicked()
+{
+    windowHelp *help = new windowHelp(this);
+    help->show();
+}
+
+void proftp::on_buttonAboutProgFTP_clicked()
+{
+    QProcess::execute("cmd /c start http://pox.alwaysdata.net/programs.php?p=progftp");
+}
+
+void proftp::on_buttonRefreshServeurs_clicked()
+{
+    QDir dir("servers/");
+    QStringList filters("*.ini" );
+    dir.setNameFilters(filters);
+    QStringList list(dir.entryList());
+
+    if(list.value(0) != "")
+    {
+        ui->menuBar->setEnabled(true);
+
+        ui->windowStart->hide();
+        ui->windowServerManager->hide();
+        ui->windowHome->show();
+
+        proftp::loadServersList();
+    }
+}
+
+void proftp::hideShowWindow()
+{
+    if(actionHideShowWindow->text() == "Hide window")
+    {
+        actionHideShowWindow->setText("Show window");
+
+        proftp::hide();
+    }
+    else
+    {
+        actionHideShowWindow->setText("Hide window");
+
+        proftp::show();
+    }
+}
+
+void proftp::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+
+    actionHideShowWindow->setText("Show window");
+
+    proftp::hide();
+
+    sticon->QSystemTrayIcon::showMessage("ProgFTP","ProgFTP est éxecuté en arrière plan.");
 }
