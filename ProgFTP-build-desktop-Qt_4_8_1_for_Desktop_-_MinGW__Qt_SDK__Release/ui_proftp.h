@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'proftp.ui'
 **
-** Created: Fri May 17 22:58:49 2013
+** Created: Mon May 20 15:18:40 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -366,6 +366,10 @@ public:
         buttonRefreshServeurs->setObjectName(QString::fromUtf8("buttonRefreshServeurs"));
         buttonRefreshServeurs->setGeometry(QRect(270, 340, 21, 21));
         proftp->setCentralWidget(centralWidget);
+        windowHome->raise();
+        windowServerManager->raise();
+        windowStart->raise();
+        windowSync->raise();
         menuBar = new QMenuBar(proftp);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 431, 20));

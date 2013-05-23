@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>655</width>
+    <width>261</width>
     <height>328</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>55555</width>
+    <width>261</width>
     <height>328</height>
    </size>
   </property>
@@ -168,8 +168,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QWidget" name="windowEnterBase" native="true">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>10</y>
+     <x>0</x>
+     <y>0</y>
      <width>261</width>
      <height>301</height>
     </rect>
@@ -259,6 +259,9 @@ p, li { white-space: pre-wrap; }
        <width>111</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
      </property>
     </widget>
     <widget class="QLineEdit" name="serverLoginEdit">

@@ -879,6 +879,10 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
+   <zorder>windowHome</zorder>
+   <zorder>windowServerManager</zorder>
+   <zorder>windowStart</zorder>
+   <zorder>windowSync</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

@@ -224,6 +224,7 @@ void proftp::connectToFtp()
 
     QDir dir(QString(settings.value("localfolder").toString()));
     dir.absolutePath();
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
     QStringList listLocalFiles(dir.entryList());
 
     ui->localFilesView->clear();
@@ -541,6 +542,7 @@ void proftp::on_localFolderView_clicked(const QModelIndex &index)
 
     QDir dir(path);
     dir.absolutePath();
+    dir.setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
     QStringList listLocalFiles(dir.entryList());
 
     ui->localFilesView->clear();

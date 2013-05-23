@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'windowaddserver.ui'
 **
-** Created: Fri May 17 22:58:49 2013
+** Created: Mon May 20 10:36:45 2013
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -57,9 +57,9 @@ public:
     {
         if (windowAddServer->objectName().isEmpty())
             windowAddServer->setObjectName(QString::fromUtf8("windowAddServer"));
-        windowAddServer->resize(655, 328);
+        windowAddServer->resize(261, 328);
         windowAddServer->setMinimumSize(QSize(261, 328));
-        windowAddServer->setMaximumSize(QSize(55555, 328));
+        windowAddServer->setMaximumSize(QSize(261, 328));
         windowEnterSyncModule = new QWidget(windowAddServer);
         windowEnterSyncModule->setObjectName(QString::fromUtf8("windowEnterSyncModule"));
         windowEnterSyncModule->setGeometry(QRect(0, 0, 261, 301));
@@ -95,7 +95,7 @@ public:
         buttonNextStepOrFinish->setGeometry(QRect(180, 300, 71, 23));
         windowEnterBase = new QWidget(windowAddServer);
         windowEnterBase->setObjectName(QString::fromUtf8("windowEnterBase"));
-        windowEnterBase->setGeometry(QRect(320, 10, 261, 301));
+        windowEnterBase->setGeometry(QRect(0, 0, 261, 301));
         label_1 = new QLabel(windowEnterBase);
         label_1->setObjectName(QString::fromUtf8("label_1"));
         label_1->setGeometry(QRect(20, 40, 71, 16));
@@ -119,6 +119,7 @@ public:
         serverPasswordEdit = new QLineEdit(accountBox);
         serverPasswordEdit->setObjectName(QString::fromUtf8("serverPasswordEdit"));
         serverPasswordEdit->setGeometry(QRect(100, 70, 111, 20));
+        serverPasswordEdit->setEchoMode(QLineEdit::Password);
         serverLoginEdit = new QLineEdit(accountBox);
         serverLoginEdit->setObjectName(QString::fromUtf8("serverLoginEdit"));
         serverLoginEdit->setGeometry(QRect(100, 30, 111, 20));
